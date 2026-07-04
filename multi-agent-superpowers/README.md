@@ -1,23 +1,26 @@
 ﻿# Multi-Agent Bootstrap
 
-这个目录提供一份可复制到任意项目 AI 编程助手或 Agent 会话中的多 Agent 启动文档：
+这个目录提供一套可复制到任意项目 AI 编程助手或 Agent 会话中的多 Agent 启动文档：
 
 - `multi-agent-bootstrap.md`
+- `templates/`
 
 它的作用是让 AI 编程助手在目标项目中初始化一套 Manager / Builder / Reviewer 协作机制，并自动创建 `.agents/`、`AGENTS.md`、任务日志、能力注册、复杂度分级、失败恢复和验收流程。
 
 该机制默认关闭，适合提交到项目仓库中作为可选协作能力。团队其他成员不会被强制启用；需要使用的人可以在本地开启。
 
+新版采用“短入口 + 按需模板”的结构：日常只需要读取 `multi-agent-bootstrap.md`；初始化或升级时才读取 `templates/` 中的细节模板，从而减少 token 消耗并加快处理速度。
+
 ## 使用方式
 
-在任意具体项目中打开一个新的 AI 编程助手或 Agent 会话，然后发送：
+推荐方式：把整个 `multi-agent-superpowers/` 目录复制到目标项目，或让 AI 能访问这个目录。然后在目标项目中打开一个新的 AI 编程助手或 Agent 会话，发送：
 
 ```text
-请完整读取并执行下面这份 Multi-Agent Bootstrap Prompt。
-执行后把协作规则写入当前项目，并初始化 .agents/ 和 AGENTS.md。
+请读取 multi-agent-superpowers/multi-agent-bootstrap.md 并执行。
+初始化或升级 .agents/ 和 AGENTS.md 时，按需读取 multi-agent-superpowers/templates/ 下的模板；日常任务不要全量读取 templates。
 ```
 
-接着把 `multi-agent-bootstrap.md` 的全文粘贴进去。
+如果当前环境无法读取目录，也可以先粘贴 `multi-agent-bootstrap.md`。AI 会创建最小可用规则，并提示你补充需要的模板文件。
 
 AI 编程助手会自动：
 
@@ -41,8 +44,10 @@ AI 编程助手会自动：
 
 新版默认采用“摘要优先、按需展开”的方式运行：
 
-- 初始化时仍创建完整规则文件，不影响功能。
+- `multi-agent-bootstrap.md` 是短入口，详细模板放在 `templates/`。
+- 初始化或兼容升级时才读取模板全文，不影响功能。
 - 日常任务只读取开关、任务日志和相关规则，不每次全量读取 `.agents/`。
+- 日常任务不读取 `templates/`，除非要升级规则或修复缺失模板。
 - 每次交互先输出精简中文 `管理决策`，明确任务编号、目标、分配对象、原因、验收标准和下一步。
 - 简单任务默认由 Manager 精简处理和自检，只输出精简 `管理决策`，不输出完整三段式报告。
 - Builder / Reviewer / sub-agent 只接收最小必要上下文。
@@ -124,7 +129,7 @@ ponytail: auto
 5. 升级完成后输出升级摘要。
 ```
 
-然后粘贴新版 `multi-agent-bootstrap.md` 全文。
+然后让 AI 读取新版 `multi-agent-bootstrap.md` 和 `templates/`；如果只能粘贴文本，先粘贴入口文件，再按 AI 提示补充对应模板。
 
 升级时重点检查：
 
@@ -137,6 +142,7 @@ ponytail: auto
 - 是否包含 `.agents/ponytail.md`、`ponytail_default` 和 Ponytail 最小实现门禁。
 - Manager / Builder / Reviewer 输出字段是否已中文化。
 - 是否包含 Token Budget Policy，避免每次任务全量读取 `.agents/`。
+- 是否支持短入口 + `templates/` 按需读取，避免每次任务全量读取 Bootstrap 长文档。
 - 是否包含 `.agents/prompt-version.md`，并能在后续规则变动时自动递增版本号。
 
 建议让 AI 最后给出：
@@ -308,6 +314,7 @@ ponytail: off
 ## 注意事项
 
 - 直接把文档喂给当前 AI 编程助手，只能保证当前会话知道这些规则。
+- 为了降低 token，推荐复制整个目录，让 AI 按需读取 `templates/`；不要每次把所有模板全文粘贴进对话。
 - 让 AI 编程助手把规则写入 `AGENTS.md` 和 `.agents/` 后，新会话更容易自动继承这些规则。
 - 初始化完成后，多 Agent 流程默认关闭，避免影响不想启用的同事。
 - 启用后正常提需求即可，不需要重复提示助手使用该流程。

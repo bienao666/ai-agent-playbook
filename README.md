@@ -4,7 +4,9 @@
 
 当前内容包括多 Agent 协作、Superpowers / skills 自动调用、agent-skills 生命周期路由、Ponytail 最小实现/反过度设计门禁，以及 AI 工作上下文系统。后续也可以继续扩展更多 AI 编程、办公、知识管理、自动化和团队协作技巧。
 
-每个目录都是一个独立能力包。进入对应目录后，阅读该目录的 `README.md`，再把其中的 Markdown 文档复制到目标项目或 AI 助手会话中执行。
+每个目录都是一个独立能力包。进入对应目录后，阅读该目录的 `README.md`，再把对应目录复制到目标项目或让 AI 按需读取其中的 Markdown 文档。
+
+为了减少 token 消耗，多 Agent 能力包采用“短入口 + 按需模板”：日常只读 `multi-agent-bootstrap.md`，初始化或升级时才读取 `templates/`。
 
 各能力包初始化后都会写入自己的版本记录文件。初始版本统一为 `v0.1.0`；后续如果 AI 修改 Prompt 规则、目录结构、协作协议或模板结构，必须自动按 patch / minor / major 规则递增版本号并记录变更。普通业务任务或新增内容资料不递增版本。
 
@@ -14,8 +16,8 @@
 
 | 目录 | 功能 | 适合场景 | 默认状态 |
 | --- | --- | --- | --- |
-| `multi-agent-superpowers` | 多 Agent 协作模板，支持自动探测 Superpowers、skills、plugins、MCP tools、Ponytail 和项目本地工具，并加入执行闭环、验证计划和迭代记录。 | 想要基础 Manager / Builder / Reviewer 流程，并让助手围绕成功标准循环执行、验证、修正，同时避免过度设计。 | 默认关闭，本地可启用 |
-| `multi-agent-superpowers-agentskills` | 多 Agent 协作模板，额外集成 `addyosmani/agent-skills` 或兼容技能库，支持 `/spec`、`/plan`、`/build`、`/test`、`/review`、`/ship` 等生命周期闭环，并把 Ponytail 映射到 `/build`、`/review`、`/code-simplify`。 | 想把多 Agent 协作和工程生命周期技能结合起来，适合更规范的需求、计划、实现、测试、审查、发布流程。 | 默认关闭，本地可启用 |
+| `multi-agent-superpowers` | 多 Agent 协作模板，采用短入口 + `templates/` 按需读取，支持自动探测 Superpowers、skills、plugins、MCP tools、Ponytail 和项目本地工具。 | 想要基础 Manager / Builder / Reviewer 流程，并让助手围绕成功标准循环执行、验证、修正，同时避免过度设计。 | 默认关闭，本地可启用 |
+| `multi-agent-superpowers-agentskills` | 多 Agent 协作模板，采用短入口 + `templates/` 按需读取，额外集成 `addyosmani/agent-skills` 或兼容技能库，并把 Ponytail 映射到 `/build`、`/review`、`/code-simplify`。 | 想把多 Agent 协作和工程生命周期技能结合起来，适合更规范的需求、计划、实现、测试、审查、发布流程。 | 默认关闭，本地可启用 |
 | `work-context-system` | AI 工作上下文系统模板，提供人物库、项目库、事件库、产出模板库的 Markdown 结构和提示词，并加入最小充分上下文原则。 | 想让 AI 更懂“写给谁看”、项目背景、历史事件和固定产出格式，适合汇报、复盘、方案、会议纪要等职场场景，同时控制资料库膨胀。 | 手动初始化 |
 | `vibe-coding-preflight` | Vibe Coding 开发前准备模板，先整理项目文件夹、定义 MVP、成功标准、验证计划、执行循环、docs 和 Git，再进入编码。 | 新建 AI 产品、网页、工具或小项目时，想避免一上来就写代码导致项目混乱。 | 手动执行 |
 
@@ -23,9 +25,10 @@
 
 1. 选择一个目录。
 2. 打开该目录的 `README.md`。
-3. 在目标项目中打开 AI 编程助手或 Agent 会话。
-4. 按目录 README 的说明，把对应 Markdown 文档全文喂给助手。
-5. 让助手把规则、模板或上下文结构写入目标项目。
+3. 优先把整个能力目录复制到目标项目，或让 AI 能读取该目录。
+4. 在目标项目中打开 AI 编程助手或 Agent 会话。
+5. 按目录 README 的说明，让助手先读入口文档，再按需读取模板。
+6. 让助手把规则、模板或上下文结构写入目标项目。
 
 ## 按需能力发现
 
