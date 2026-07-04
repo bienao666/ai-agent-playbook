@@ -60,11 +60,38 @@
 
 ### 输出压缩策略
 
-- 简单任务默认不输出完整 Manager Decision / Builder Report / Review Result，除非用户要求或 `reviewer_for_simple` 为 `on`。
+- 每次交互开始处理前都必须先给用户一个精简的 `管理决策` 反馈，让用户明确知道任务编号、目标、分配对象、原因、验收标准和下一步。
+- 简单任务默认输出精简 `管理决策`，不输出完整 Builder Report / Review Result，除非用户要求或 `reviewer_for_simple` 为 `on`。
 - 中等和复杂任务保留结构化字段，但每个字段优先写 1 到 3 行。
 - task log、iteration log 只追加一行摘要，不重复记录完整对话。
 - 能用文件路径、任务编号和结论表达的内容，不要复制大段代码或大段文档。
 - 历史记录按 `.agents/history-retention.md` 保留和归档；默认只读取热记录，不读取完整归档。
+
+### 用户可见管理决策
+
+每次用户提出新请求、补充约束、要求继续、要求暂停或要求切换策略时，Manager 都必须先输出一个用户可见的精简反馈。
+
+格式必须使用中文标题和字段：
+
+```md
+## 管理决策
+
+- 任务编号：`T-...`
+- 目标：...
+- 分配对象：Manager 直接检查 / Builder 实现 / Reviewer 复核 / 临时 Agent ...
+- 原因：...
+- 验收标准：...
+- 下一步：...
+```
+
+规则：
+
+- 字段必须完整，但每个字段保持 1 到 2 行。
+- 简单只读任务也要输出 `管理决策`，分配对象可写 `Manager 直接检查`。
+- 如果用户明确要求先反馈、等通知再改，下一步只能写读取、比对、确认或等待，不得写实现。
+- 如果当前规则不允许创建真实 sub-agent，原因里必须说明，并使用 Manager 直接处理或同会话角色模拟。
+- 如果任务尚未明确到可以执行，下一步写“提出一个澄清问题”。
+- 不要为了输出 `管理决策` 而扩大上下文或创建不必要任务。
 
 ### 触发完整模式
 
@@ -197,11 +224,11 @@ AGENTS.md
 输出格式必须包含：
 
 ```md
-## Manager Decision
+## 管理决策
 
 任务编号:
 目标:
-分配给:
+分配对象:
 原因:
 验收标准:
 下一步:
@@ -977,12 +1004,30 @@ For every new user request:
 2. Check whether Reviewer is enabled for simple tasks.
 3. Check whether real sub-agents are authorized.
 4. If enabled, treat the request as entering the Manager intake queue.
-5. If enabled, classify complexity.
-6. If enabled, check relevant capabilities.
-7. If enabled, choose the workflow automatically.
-8. If disabled, proceed with normal single-agent handling.
+5. If enabled, immediately show a concise Chinese `管理决策` with task id, goal, assignee, reason, acceptance criteria, and next step.
+6. If enabled, classify complexity.
+7. If enabled, check relevant capabilities.
+8. If enabled, choose the workflow automatically.
+9. If disabled, proceed with normal single-agent handling.
 
 When enabled, the user should be able to ask naturally. Do not require phrases like "use multi-agent mode" or "use Manager / Builder / Reviewer".
+
+## User Visible Manager Feedback
+
+When Multi-Agent Mode is enabled, every interaction must start with:
+
+```md
+## 管理决策
+
+- 任务编号:
+- 目标:
+- 分配对象:
+- 原因:
+- 验收标准:
+- 下一步:
+```
+
+Keep it concise. Simple read-only tasks still need this feedback, with `分配对象` set to `Manager 直接检查` when no Builder or Reviewer is needed.
 
 ## Decision And Lesson Logs
 
@@ -1124,6 +1169,7 @@ Ponytail not detected; using local minimal implementation gate.
    - 如果未启用，不创建 Task ID，除非用户明确要求。
    - 将用户需求转成明确 Task。
    - 分配 Task ID，例如 `T-001`。
+   - 立即向用户输出精简 `管理决策`，说明任务编号、目标、分配对象、原因、验收标准和下一步。
    - 写入 task log。
    - 判断是否有 Superpowers、skills、plugins 或 MCP tools 适合该任务。
    - 如果任务需要专业能力，按需查询合适的插件、skill、MCP tool、Superpowers 或项目本地工具。
